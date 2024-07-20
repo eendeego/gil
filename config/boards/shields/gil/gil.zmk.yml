@@ -1,0 +1,11 @@
+file_format: "1"
+id: gil
+name: gil
+type: shield
+url: https://github.com/soarez/gil
+requires: [pro_micro]
+features:
+  - keys
+siblings:
+  - gil_left
+  - gil_right

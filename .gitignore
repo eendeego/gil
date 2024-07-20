@@ -1,0 +1,8 @@
+.west/
+build/
+firware/
+modules/
+zephyr-sdk-*/
+zephyr/
+zmk/
+firmware/
