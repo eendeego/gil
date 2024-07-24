@@ -7,12 +7,12 @@
 &lt {
     tapping-term-ms= <100>;
     quick-tap-ms = <200>;
-    flavor = "balanced";
+    flavor = "tap-preferred";
 };
 &mt {
     tapping-term-ms = <150>;
     quick-tap-ms = <200>;
-    flavor = "balanced";
+    flavor = "tap-preferred";
 };
 &soft_off {
     hold-time-ms = <5000>; // Only turn off it the key is held for 5 seconds or longer.
@@ -35,7 +35,7 @@
             #binding-cells = <2>;
             tapping-term-ms = <200>;
             quick-tap-ms = <200>;
-            flavor = "balanced";
+            flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
         };
     };
