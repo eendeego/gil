@@ -48,7 +48,7 @@ build() {
     # Initialize and update west modules
     if [[ ! -d "${this_dir}/.west" ]]; then
         west init -l "${config_dir}"
-        west update
+        # west update
         west zephyr-export
     fi
 
@@ -70,7 +70,6 @@ build() {
     fi
     build_args+=( -- "${cmake_args[@]}" )
     export ZEPHYR_SDK_INSTALL_DIR="$zephyr_sdk_path"
-    echo "building"
     west build "${build_args[@]}"
 
     mkdir -p "$firmware_dir"

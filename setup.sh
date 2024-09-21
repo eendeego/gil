@@ -1,12 +1,14 @@
 
-brew_dir="$(dirname "$(brew --cellar)")"
+brew_dir="$(brew --cellar)"
 brew_ensure() {
     local package="$1"
-    if [[ -e "${brew_dir}/${package}" ]] ; then
-        if ! brew --prefix "$package" > /dev/null; then
+    if [[ ! -e "${brew_dir}/${package}" ]] ; then
+        if [[ -z "$(brew --prefix "$package" > /dev/null)" ]]; then
             brew install "$package"
+            return
         fi
     fi
+    echo "-- Found $package"
 }
 brew_ensure cmake
 brew_ensure ninja
@@ -26,7 +28,9 @@ pip_ensure() {
     local package="$1"
     if ! pip show "$package" > /dev/null; then
         pip install "$package"
+        return
     fi
+    echo "-- Found $package"
 }
 pip_ensure remarshal
 pip_ensure west

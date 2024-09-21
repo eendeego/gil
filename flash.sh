@@ -19,7 +19,7 @@ serial_number() {
 
 wait_reset() {
     local half="$1"
-    echo "Double click the reset button on the $half half ..."
+    echo "Plug in and double click the reset button on the $half half ..."
     while true; do
         if [[ -d "$dev_mount" ]]; then
             break
