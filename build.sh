@@ -48,7 +48,7 @@ build() {
     # Initialize and update west modules
     if [[ ! -d "${this_dir}/.west" ]]; then
         west init -l "${config_dir}"
-        # west update
+        west update
         west zephyr-export
     fi
 
