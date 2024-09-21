@@ -2,7 +2,7 @@
 build/
 firware/
 modules/
-zephyr-sdk-*/
+zephyr-sdk-*
 zephyr/
 zmk/
 firmware/
