@@ -54,6 +54,15 @@ if [[ ! -d "$zephyr_sdk_path" ]]; then
     header -T "Done!"
 fi
 
+build_init() {
+    # Initialize and update west modules
+    if [[ ! -d "${this_dir}/.west" ]]; then
+        west init -l "${config_dir}"
+        west update
+        west zephyr-export
+    fi
+}
+
 build() {
     local job board shield artifact_name snippet
     job="$1"
@@ -74,13 +83,6 @@ build() {
     # fi
 
     header "Building $artifact_name"
-
-    # Initialize and update west modules
-    if [[ ! -d "${this_dir}/.west" ]]; then
-        west init -l "${config_dir}"
-        west update
-        west zephyr-export
-    fi
 
     rm -rf "${build_dir}"
     build_args=(
@@ -124,6 +126,8 @@ if [ -e zephyr/module.yml ]; then
 fi
 
 header "Building All the things!"
+
+build_init
 
 yaml2json "${this_dir}/build.yaml" \
     | jq -c '.include[]' \
