@@ -49,7 +49,7 @@ if [[ ! -d "$zephyr_sdk_path" ]]; then
     fi
 
     header -T -B "  Untarring zephyr-sdk"
-    tar xf "$zephyr_archive"
+    pv "$zephyr_archive" | tar x
 
     header -T "Done!"
 fi
