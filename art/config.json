@@ -1,0 +1,41 @@
+{
+  "images": [
+    {
+      "name": "test_pattern_01",
+      "file": "test_pattern_01.png",
+      "color_convert": "monochrome",
+      "license": "mit"
+    },
+    {
+      "name": "test_pattern_02",
+      "file": "test_pattern_03.png",
+      "color_convert": "monochrome",
+      "license": "mit"
+    },
+    {
+      "name": "test_pattern_03",
+      "file": "test_pattern_03.png",
+      "color_convert": "monochrome",
+      "license": "mit"
+    },
+    {
+      "name": "test_pattern_04a",
+      "file": "test_pattern_04.png",
+      "color_convert": "monochrome",
+      "license": "mit"
+    },
+    {
+      "name": "test_pattern_04b",
+      "file": "test_pattern_04.png",
+      "color_convert": "threshold",
+      "license": "mit"
+    },
+    {
+      "name": "test_pattern_04c",
+      "file": "test_pattern_04.png",
+      "color_convert": "h4x4a",
+      "license": "mit"
+    }
+  ],
+  "display": ["test_pattern_03", "test_pattern_04c"]
+}
