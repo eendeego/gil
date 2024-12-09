@@ -2,6 +2,27 @@
 
 set -euo pipefail
 
+header() {
+    local args top_line bottom_line
+    args=(${@})
+    top_line=1
+    bottom_line=1
+
+    # Something something skill issues
+    [[ "$1" == "-T" ]] && top_line=0 && shift
+    [[ "$1" == "-B" ]] && bottom_line=0 && shift
+
+    if (( $top_line )); then
+        echo -e "\n========================================================================"
+    fi
+
+    echo == "${@}"
+
+    if (( $bottom_line )); then
+        echo -e "========================================================================\n"
+    fi
+}
+
 this_dir="$(cd "$(dirname "$0")" && pwd)"
 config_dir="${this_dir}/config"
 fallback_binary="bin"
@@ -10,6 +31,8 @@ firmware_dir="${this_dir}/firmware"
 
 cd "$this_dir"
 
+header "Running setup ======================================================="
+# This put venv in shell env (amongst other things)
 source "$this_dir/setup.sh"
 
 zephyr_version='0.16.3'
@@ -18,10 +41,17 @@ zephyr_sdk_path="${this_dir}/zephyr-sdk-${zephyr_version}/"
 zephyr_build='macos-aarch64'
 zephyr_archive="zephyr-sdk-${zephyr_version}_${zephyr_build}.tar.xz"
 if [[ ! -d "$zephyr_sdk_path" ]]; then
+    header -B "Installing zephyr-sdk ==============================================="
+
     if [[ ! -f "$zephyr_archive" ]]; then
+        header -T -B "  Fetching zephyr-sdk"
         curl -LO "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${zephyr_version}/$zephyr_archive"
     fi
+
+    header -T -B "  Untarring zephyr-sdk"
     tar xf "$zephyr_archive"
+
+    header -T "Done!"
 fi
 
 build() {
@@ -43,7 +73,7 @@ build() {
     #     fi
     # fi
 
-    echo "Building $artifact_name"
+    header "Building $artifact_name"
 
     # Initialize and update west modules
     if [[ ! -d "${this_dir}/.west" ]]; then
@@ -70,6 +100,9 @@ build() {
     fi
     build_args+=( -- "${cmake_args[@]}" )
     export ZEPHYR_SDK_INSTALL_DIR="$zephyr_sdk_path"
+
+    header "west build" "${build_args[@]}"
+    
     west build "${build_args[@]}"
 
     mkdir -p "$firmware_dir"
@@ -90,6 +123,8 @@ if [ -e zephyr/module.yml ]; then
     >&2 echo "ERROR: Branch not implemented!"; exit 1
 fi
 
+header "Building All the things!"
+
 yaml2json "${this_dir}/build.yaml" \
     | jq -c '.include[]' \
     | while read job
@@ -97,8 +132,4 @@ do
     build "$job"
 done
 
-cat <<EOF
-===============
-== DONE! ======
-===============
-EOF
+header "DONE! ==============================================================="
