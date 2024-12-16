@@ -3,24 +3,25 @@
 set -euo pipefail
 
 header() {
-    local args top_line bottom_line
-    args=(${@})
-    top_line=1
-    bottom_line=1
+    local bar='========================================================================'
+    local top="\n${bar}\n"
+    local bottom="\n${bar}\n"
+    local middle
 
-    # Something something skill issues
-    [[ "$1" == "-T" ]] && top_line=0 && shift
-    [[ "$1" == "-B" ]] && bottom_line=0 && shift
-
-    if (( $top_line )); then
-        echo -e "\n========================================================================"
+    while [[ "$1" == -* ]]; do
+        case $1 in
+            --top|-T) top=''; ;;
+            --bottom|-B) bottom=''; ;;
+            *) >&2 echo "ERROR: Unknown flag $1"; exit 0; ;;
+        esac
+        shift
+    done
+    middle="== ${*}"
+    if [[ -n "$top" ]]; then
+        middle="${middle} ${bar}"
+        middle="${middle:0:${#bar}}"
     fi
-
-    echo == "${@}"
-
-    if (( $bottom_line )); then
-        echo -e "========================================================================\n"
-    fi
+    echo -e "${top}${middle}${bottom}"
 }
 
 this_dir="$(cd "$(dirname "$0")" && pwd)"

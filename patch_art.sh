@@ -1,10 +1,12 @@
 #!/bin/bash
 
-ART_FILE=zmk/app/boards/shields/nice_view/widgets/art.c
-PERIPHERAL_STATUS_FILE=zmk/app/boards/shields/nice_view/widgets/peripheral_status.c
+this_dir="$(cd "$(dirname "$0")" && pwd)"
+widgets_dir="${this_dir}/zmk/app/boards/shields/nice_view"
+ART_FILE="${widgets_dir}/art.c"
+PERIPHERAL_STATUS_FILE="${widgets_dir}/peripheral_status.c"
 
 reset_zmk() {
-    cd zmk
+    cd "${this_dir}/zmk"
 
     # Clean slate repo
     git restore .
@@ -14,11 +16,10 @@ reset_zmk() {
 }
 
 generate_lvgl_img() {
-    local name all_caps
-    name=$1
-    src=$2
+    local name=$1
+    local src=$2
 
-    all_caps=$(echo "$name" | tr "[:lower:]" "[:upper:]")
+    local all_caps=$(tr "[:lower:]" "[:upper:]" <<<"$name")
 
     cat <<EOF
 #ifndef LV_ATTRIBUTE_IMG_${all_caps}
@@ -85,7 +86,7 @@ magick_args() {
         args+=("art/preview/${name}.png")
     fi
 
-    echo ${args[@]}
+    echo "${args[@]}"
 }
 
 reset_zmk
