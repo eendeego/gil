@@ -17,7 +17,9 @@ brew_ensure ccache
 brew_ensure qemu
 brew_ensure dtc
 brew_ensure libmagic
+brew_ensure pv
 brew_ensure wget
+brew_ensure imagemagick
 # brew_ensure openocd
 
 if [ ! -f ".venv/bin/activate" ]; then

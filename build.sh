@@ -2,6 +2,28 @@
 
 set -euo pipefail
 
+header() {
+    local bar='========================================================================'
+    local top="\n${bar}\n"
+    local bottom="\n${bar}\n"
+    local middle
+
+    while [[ "$1" == -* ]]; do
+        case $1 in
+            --top|-T) top=''; ;;
+            --bottom|-B) bottom=''; ;;
+            *) >&2 echo "ERROR: Unknown flag $1"; exit 0; ;;
+        esac
+        shift
+    done
+    middle="== ${*}"
+    if [[ -n "$top" ]]; then
+        middle="${middle} ${bar}"
+        middle="${middle:0:${#bar}}"
+    fi
+    echo -e "${top}${middle}${bottom}"
+}
+
 this_dir="$(cd "$(dirname "$0")" && pwd)"
 config_dir="${this_dir}/config"
 fallback_binary="bin"
@@ -10,6 +32,8 @@ firmware_dir="${this_dir}/firmware"
 
 cd "$this_dir"
 
+header "Running setup ======================================================="
+# This put venv in shell env (amongst other things)
 source "$this_dir/setup.sh"
 
 zephyr_version='0.16.3'
@@ -18,11 +42,27 @@ zephyr_sdk_path="${this_dir}/zephyr-sdk-${zephyr_version}/"
 zephyr_build='macos-aarch64'
 zephyr_archive="zephyr-sdk-${zephyr_version}_${zephyr_build}.tar.xz"
 if [[ ! -d "$zephyr_sdk_path" ]]; then
+    header -B "Installing zephyr-sdk ==============================================="
+
     if [[ ! -f "$zephyr_archive" ]]; then
+        header -T -B "  Fetching zephyr-sdk"
         curl -LO "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${zephyr_version}/$zephyr_archive"
     fi
-    tar xf "$zephyr_archive"
+
+    header -T -B "  Untarring zephyr-sdk"
+    pv "$zephyr_archive" | tar x
+
+    header -T "Done!"
 fi
+
+build_init() {
+    # Initialize and update west modules
+    if [[ ! -d "${this_dir}/.west" ]]; then
+        west init -l "${config_dir}"
+        west update
+        west zephyr-export
+    fi
+}
 
 build() {
     local job board shield artifact_name snippet
@@ -43,14 +83,7 @@ build() {
     #     fi
     # fi
 
-    echo "Building $artifact_name"
-
-    # Initialize and update west modules
-    if [[ ! -d "${this_dir}/.west" ]]; then
-        west init -l "${config_dir}"
-        west update
-        west zephyr-export
-    fi
+    header "Building $artifact_name"
 
     rm -rf "${build_dir}"
     build_args=(
@@ -70,6 +103,9 @@ build() {
     fi
     build_args+=( -- "${cmake_args[@]}" )
     export ZEPHYR_SDK_INSTALL_DIR="$zephyr_sdk_path"
+
+    header "west build" "${build_args[@]}"
+    
     west build "${build_args[@]}"
 
     mkdir -p "$firmware_dir"
@@ -90,6 +126,12 @@ if [ -e zephyr/module.yml ]; then
     >&2 echo "ERROR: Branch not implemented!"; exit 1
 fi
 
+header "Building All the things!"
+
+build_init
+
+sh ./patch_art.sh
+
 yaml2json "${this_dir}/build.yaml" \
     | jq -c '.include[]' \
     | while read job
@@ -97,8 +139,4 @@ do
     build "$job"
 done
 
-cat <<EOF
-===============
-== DONE! ======
-===============
-EOF
+header "DONE! ==============================================================="
