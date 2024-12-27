@@ -90,37 +90,37 @@
         layer_5 {
             label = "L5";
             bindings = <
-&trans       &trans       &trans       &trans       &bootloader         &kp F1   &kp F2   &kp F3   &kp F4      &kp F5
-&trans       &trans       &trans       &trans       &sys_reset          &kp F6   &kp F7   &kp F8   &kp F9      &kp F10
-&bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4        &kp F10  &kp F11  &kp F12  &sys_reset  &bootloader
-                                       &none        &none               &none    &none
+&kp KP_PLUS   &kp KP_N1  &kp KP_N2  &kp KP_N3  &kp KP_ASTERISK   &kp F1   &kp F2   &kp F3   &kp F4      &kp F5
+&kp KP_MINUS  &kp KP_N4  &kp KP_N5  &kp KP_N6  &kp KP_SLASH      &kp F6   &kp F7   &kp F8   &kp F9      &kp F10
+&kp KP_DOT    &kp KP_N7  &kp KP_N8  &kp KP_N9  &kp KP_N0         &kp F11  &kp F12  &none    &none       &none
+                                    &none      &none             &none    &none
             >;
         };
         layer_6 {
             label = "L6";
             bindings = <
-&trans &trans &trans &trans &trans    &kp KP_PLUS   &kp KP_N1  &kp KP_N2  &kp KP_N3  &kp KP_ASTERISK
-&trans &trans &trans &trans &trans    &kp KP_MINUS  &kp KP_N4  &kp KP_N5  &kp KP_N6  &kp KP_SLASH
-&trans &trans &trans &trans &trans    &kp KP_N0     &kp KP_N7  &kp KP_N8  &kp KP_N9  &kp KP_DOT
-                     &none  &none     &none         &none
+&none &none &none &none &none  &none &none &none &none &none
+&none &none &none &none &none  &none &none &none &none &none
+&none &none &none &none &none  &none &none &none &none &none
+                  &none &none  &none &none
             >;
         };
         layer_7 {
             label = "L7";
             bindings = <
-&kp C_FF &none           &kp K_MUTE   &none &bootloader  &bootloader &none &none &none &none
-&kp C_RW &kp PAUSE_BREAK &kp K_VOL_UP &none &sys_reset   &sys_reset  &none &none &none &none
-&kp C_PP &kp SLCK        &kp K_VOL_DN &none &none        &none       &none &none &none &none
-                                      &none &none        &none       &none
+&kp C_FF &ext_power EP_TOG &kp K_MUTE   &none      &none        &bt BT_SEL 0   &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3   &bt BT_SEL 4
+&kp C_RW &kp PAUSE_BREAK   &kp K_VOL_UP &none      &none        &bt BT_DISC 0  &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3  &bt BT_DISC 4
+&kp C_PP &kp SLCK          &kp K_VOL_DN &sys_reset &bootloader  &bootloader    &sys_reset    &soft_off     &out OUT_TOG   &bt BT_CLR
+                                      &none      &none          &none          &none
             >;
         };
         layer_8 {
             label = "L8";
             bindings = <
-&none &none &none &none &bootloader    &bootloader   &none &none &none &none
-&none &none &none &none &sys_reset     &sys_reset    &none &none &none &none
-&none &none &none &none &out OUT_TOG   &out OUT_TOG  &none &none &none &none
-                  &none &none          &none         &none
+&none &none &none &none      &none              &bt BT_SEL 0   &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3   &bt BT_SEL 4
+&none &none &none &none      &ext_power EP_TOG  &bt BT_DISC 0  &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3  &bt BT_DISC 4
+&none &none &none &sys_reset &bootloader        &bootloader    &sys_reset    &soft_off     &out OUT_TOG   &bt BT_CLR
+                  &none      &none              &none          &none
             >;
         };
     };
