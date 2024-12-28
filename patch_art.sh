@@ -1,7 +1,7 @@
 #!/bin/bash
 
 this_dir="$(cd "$(dirname "$0")" && pwd)"
-widgets_dir="${this_dir}/zmk/app/boards/shields/nice_view"
+widgets_dir="${this_dir}/zmk/app/boards/shields/nice_view/widgets"
 ART_FILE="${widgets_dir}/art.c"
 PERIPHERAL_STATUS_FILE="${widgets_dir}/peripheral_status.c"
 
