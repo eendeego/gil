@@ -1,9 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail
+
 this_dir="$(cd "$(dirname "$0")" && pwd)"
-widgets_dir="${this_dir}/zmk/app/boards/shields/nice_view"
+widgets_dir="${this_dir}/zmk/app/boards/shields/nice_view/widgets"
 ART_FILE="${widgets_dir}/art.c"
 PERIPHERAL_STATUS_FILE="${widgets_dir}/peripheral_status.c"
+
+IMG_SIZE="68x140"
 
 reset_zmk() {
     cd "${this_dir}/zmk"
@@ -36,7 +40,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_${all_cap
 #endif
 EOF
     # Skip 10 bytes (header), write as C code
-    hexdump -s 10 -v -e '"        " 18/1 "0x%02x, " "\n"' "${src}"
+    hexdump -s 10 -v -e '"        " 18/1 "0x%02x, " "\n"' "${src}" | sed -e 's/0x  /0xff/g'
 
     cat <<EOF
 };
@@ -57,15 +61,43 @@ magick_args() {
     local name tmp_dir preview file resize color_convert magick_args
     name=$1
     tmp_dir=$2
-    preview=$3
+    preview=${3-code}
 
-    read -d "\t" -r file resize color_convert magick_args \
+    # This read always returns with exit code 1
+    # Use `if` trick from https://stackoverflow.com/a/67066283/543452
+    if read  -d "\t" -r file resize color_convert magick_args; then :; fi \
         <<< $(jq -r ".images[] | select(.name == \"${name}\") | [(.file // false), (.resize // false), (.color_convert // \"none\"), (.magick_args // \"-\")] | @tsv" art/config.json)
 
     local -a args=("art/$file")
 
-    if [[ "$resize" == "true" ]]; then
-        args+=("-resize" "68x140")
+    if [[ "$resize" == "proportional" ]]; then
+        # Image is expected to be proportional to 68x140
+
+        local size_modulus
+        size_modulus=$(file "art/$file" | perl -p -e 's/.*?\s(\d+)\sx\s(\d+).*/($1\*140)%($2*68)/g' | bc)
+
+        if [[ "$size_modulus" != "0" ]]; then
+            local size
+            size=$(file "art/$file" | perl -p -e 's/.*?\s(\d+\sx\s\d+).*/$1/g')
+            echo Image size \(${size}\) not proportional to 68x140. Use either \"ignoreAspectRatio\", or \"fill\" resize strategy instead. >&2
+            exit 1
+        fi
+
+        args+=("-resize" "${IMG_SIZE}")
+    elif [[ "$resize" == "ignoreAspectRatio" ]]; then
+        # Image will be distorted
+        args+=("-resize" "${IMG_SIZE}!")
+    elif [[ "$resize" == "fill" ]]; then
+        # Resize the image based on the smallest fitting dimension 
+        args+=("-resize" "${IMG_SIZE}^" "-gravity" "center" "-extent" "${IMG_SIZE}")
+    else
+        local size
+        size=$(file "art/$file" | perl -p -e 's/.*?\s(\d+\sx\s\d+).*/$1/g')
+        if [[ "$size" != "68 x 140" ]]; then
+            echo Invalid image size: "${size}". Use \"resize\" to set a resize strategy. >&2
+            echo Available resize strategies: \"proportional\", \"ignoreAspectRatio\", \"fill\" >&2
+            exit 1
+        fi
     fi
 
     if [[ "$color_convert" == "monochrome" ]]; then
@@ -77,7 +109,7 @@ magick_args() {
     fi
 
     if [[ ! "$magick_args" == "-" ]]; then
-        args+="$magick_args"
+        args+=("$magick_args")
     fi
 
     if [[ "$preview" != "-preview" ]]; then
@@ -121,7 +153,12 @@ jq -r '.display[]' art/config.json \
 do
     read -r name <<< $(echo "${line}")
 
+    # Call magick_args separately, otherwize `magick` will still run
+    declare -a preview_args
+    preview_args=$(magick_args $name "${tmp_dir}" -preview)
+
     magick $(magick_args $name "${tmp_dir}" -preview)
+    magick ${preview_args[@]}
     magick $(magick_args $name "${tmp_dir}")
     generate_lvgl_img $name "$tmp_dir/$name.pbm" >> $ART_FILE
 done
