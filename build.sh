@@ -130,7 +130,7 @@ header "Building All the things!"
 
 build_init
 
-sh ./patch_art.sh
+bash ./patch_art.sh
 
 yaml2json "${this_dir}/build.yaml" \
     | jq -c '.include[]' \
