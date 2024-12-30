@@ -7,17 +7,18 @@ art_dir="${this_dir}/art"
 config_json="${art_dir}/config.json"
 
 magick_args() {
-    local name="$1"
+    local -n args="$1"
+    local name="$2"
 
     local config file resize color_convert magick_args
     config="$(jq -c '.images[] | select(.name == "'"${name}"'") | {name,file,resize,color_convert,magick_args}' "${config_json}")"
-    file="$(         jq -r '.file          // false'  <<<"$config")"
+    file="$(         jq -r '.file                  '  <<<"$config")"
     resize="$(       jq -r '.resize        // false'  <<<"$config")"
     color_convert="$(jq -r '.color_convert // "none"' <<<"$config")"
     magick_args="$(  jq -r '.magick_args   // "-"'    <<<"$config")"
 
     local src_file="${art_dir}/${file}"
-    local -a args=("${src_file}")
+    args=("${src_file}")
 
     local IMG_SIZE="68x140"
     case "$resize" in
@@ -67,22 +68,24 @@ EOF
     if [[ "$magick_args" != "-" ]]; then
         args+=("$magick_args")
     fi
-
-    echo "${args[@]}"
 }
 
 gen_preview() {
     local name="$1"
     local file="${art_dir}/preview/${name}.png"
     mkdir -p "$(dirname "${file}")"
-    magick $(magick_args "$1") "${file}"
+    local -a margs
+    magick_args margs "$1"
+    magick "${margs[@]}" "${file}"
     echo "Generated preview: ${file}"
 }
 
 gen_hex_c() {
     local name="$1"
+    local -a margs
+    magick_args margs "$1"
     # Skip 10 bytes (header), write as C code
-    magick $(magick_args "${name}") "-rotate" "90" PBM:- \
+    magick "${margs[@]}" "${name}" "-rotate" "90" PBM:- \
         | hexdump -s 10 -v -e '"        " 18/1 "0x%02x, " "\n"' \
         | sed -e 's/0x  /0xff/g'
 }
@@ -178,12 +181,12 @@ patch_zmk() {
     echo "ZMK nice_view widget patched with selected images: $images"
 }
 
-# # Preview all images, which is useful when testing stuff
-# jq -r '.images[].name' "${config_json}" \
-#     | while read -r name ; do
-#     gen_preview "$name"
-# done
-# exit 0
+# Preview all images, which is useful when testing stuff
+jq -r '.images[].name' "${config_json}" \
+    | while read -r name ; do
+    gen_preview "$name"
+done
+exit 0
 
 patch_zmk
 
