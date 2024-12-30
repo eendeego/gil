@@ -10,6 +10,17 @@ brew_ensure() {
     fi
     echo "-- Found $package"
 }
+
+if [[ "${BASH_VERSION%%.*}" -lt 4 ]]; then
+    brew_ensure bash
+    if [[ "$(bash -c 'echo $BASH_VERSION' | cut -f 1 -d '.')" -ge 4 ]]; then
+        exec bash "$0" "$@"
+    else
+        >&2 echo "ERROR: Bash 4+ is required"
+        exit 1
+    fi
+fi
+
 brew_ensure cmake
 brew_ensure ninja
 brew_ensure gperf
@@ -37,3 +48,26 @@ pip_ensure() {
 pip_ensure remarshal
 pip_ensure west
 pip_ensure pyelftools
+
+header() {
+    local bar='========================================================================'
+    local top="\n${bar}\n"
+    local bottom="\n${bar}\n"
+    local middle
+
+    while [[ "$1" == -* ]]; do
+        case $1 in
+            --top|-T) top=''; ;;
+            --bottom|-B) bottom=''; ;;
+            *) >&2 echo "ERROR: Unknown flag $1"; exit 0; ;;
+        esac
+        shift
+    done
+    middle="== ${*}"
+    if [[ -n "$top" ]]; then
+        middle="${middle} ${bar}"
+        middle="${middle:0:${#bar}}"
+    fi
+    echo -e "${top}${middle}${bottom}"
+}
+

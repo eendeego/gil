@@ -2,39 +2,15 @@
 
 set -euo pipefail
 
-header() {
-    local bar='========================================================================'
-    local top="\n${bar}\n"
-    local bottom="\n${bar}\n"
-    local middle
-
-    while [[ "$1" == -* ]]; do
-        case $1 in
-            --top|-T) top=''; ;;
-            --bottom|-B) bottom=''; ;;
-            *) >&2 echo "ERROR: Unknown flag $1"; exit 0; ;;
-        esac
-        shift
-    done
-    middle="== ${*}"
-    if [[ -n "$top" ]]; then
-        middle="${middle} ${bar}"
-        middle="${middle:0:${#bar}}"
-    fi
-    echo -e "${top}${middle}${bottom}"
-}
-
 this_dir="$(cd "$(dirname "$0")" && pwd)"
+source "${this_dir}/setup.sh"
 config_dir="${this_dir}/config"
 fallback_binary="bin"
 build_dir="${this_dir}/build"
 firmware_dir="${this_dir}/firmware"
-
 cd "$this_dir"
 
 header "Running setup ======================================================="
-# This put venv in shell env (amongst other things)
-source "$this_dir/setup.sh"
 
 zephyr_version='0.16.3'
 zephyr_sdk_path="${this_dir}/zephyr-sdk-${zephyr_version}/"
