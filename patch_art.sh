@@ -48,8 +48,8 @@ EOF
             size="$(file "${src_file}" | perl -p -e 's/.*?\s(\d+\sx\s\d+).*/$1/g')"
             if [[ "$size" != "68 x 140" ]]; then
                 >&2 cat <<EOF
-ERROR: Invalid image size: "${size}" for $file. Use "resize" to set a resize strategy.
-Available resize strategies: "proportional", "ignoreAspectRatio", "fill"
+ERROR: Invalid image size ($size) for $file. Use "resize" to set a resize strategy.
+Available resize strategies: "proportional", "ignoreAspectRatio", "fill".
 EOF
                 exit 1
             fi
