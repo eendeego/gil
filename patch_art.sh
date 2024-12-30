@@ -28,7 +28,10 @@ magick_args() {
             if [[ "$size_modulus" != "0" ]]; then
                 local size
                 size=$(file "${src_file}" | perl -p -e 's/.*?\s(\d+\sx\s\d+).*/$1/g')
-                >&2 echo "ERROR: Image size \(${size}\) not proportional to 68x140. Use either \"ignoreAspectRatio\", or \"fill\" resize strategy instead."
+                >&2 cat <<EOF
+ERROR: Image size (${size}) not proportional to 68x140.
+Use either "ignoreAspectRatio", or "fill" resize strategy instead.
+EOF
                 exit 1
             fi
 
