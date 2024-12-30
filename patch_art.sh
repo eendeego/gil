@@ -60,6 +60,7 @@ EOF
         "monochrome") args+=("-monochrome") ;;
         "threshold")  args+=("-threshold" "50%") ;;
         "h4x4a")      args+=("-colorspace" "Gray" "-ordered-dither" "h4x4a") ;;
+        "none")       ;;
         *) >&2 echo "ERROR: Unsupported color_convert option \"${color_convert}\"" && exit 1;;
     esac
 
