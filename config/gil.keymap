@@ -72,10 +72,10 @@
         layer_3 {
             label = "L3";
             bindings = <
-&kp GRAVE  &trans    &kp UP     &trans      &trans       &bt BT_SEL 0       &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
-&caps_word &kp LEFT  &kp DOWN   &kp RIGHT   &kp BSPC     &bt BT_DISC 0      &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4
-&kp LG(Z)  &kp LG(X) &kp LG(C)  &kp LG(V)   &kp ENTER    &ext_power EP_TOG  &soft_off     &trans        &trans        &bt BT_CLR
-                                &none       &mo 5        &trans             &trans
+&kp GRAVE  &trans    &kp UP     &trans      &trans       &trans  &trans  &trans  &trans  &trans
+&caps_word &kp LEFT  &kp DOWN   &kp RIGHT   &kp BSPC     &trans  &trans  &trans  &trans  &trans
+&kp LG(Z)  &kp LG(X) &kp LG(C)  &kp LG(V)   &kp ENTER    &trans  &trans  &trans  &trans  &trans
+                                &none       &mo 5        &trans  &trans
             >;
         };
         layer_4 {
